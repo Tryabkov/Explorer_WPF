@@ -5,6 +5,23 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="resourses\LeftArrow.png" />
+    <None Remove="resourses\RightArrow.png" />
+    <None Remove="resourses\UpArrow.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="resourses\LeftArrow.png" />
+    <Resource Include="resourses\RightArrow.png" />
+    <Resource Include="resourses\UpArrow.png" />
+  </ItemGroup>
 
 </Project>
