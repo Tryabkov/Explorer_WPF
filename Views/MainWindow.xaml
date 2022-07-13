@@ -7,7 +7,7 @@
         xmlns:viewmodels="clr-namespace:Explorer_WPF.ViewModels"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" MinHeight="250" MinWidth="400">
+        Title="MainWindow" Height="450" Width="800" MinHeight="250" MinWidth="400" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <viewmodels:MainWindowViewModel/>
@@ -31,7 +31,7 @@
             <RowDefinition Height="15"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="0">
+        <StackPanel x:Name="stackPanel" Orientation="Horizontal" Grid.Row="0">
 
         </StackPanel>
 
@@ -58,15 +58,15 @@
                 <Button x:Name="UpButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" Command="{Binding UpButton_Click}" />
             </StackPanel>
 
-            <TextBlock x:Name="PathTextBlock" Margin="2" Grid.Column="1" FontSize="22" TextAlignment="Center" Text="{Binding UI_CurrentPath}"/>
+            <TextBlock x:Name="PathTextBlock" Margin="24,2,2,2" Grid.Column="1" FontSize="22" TextAlignment="Left" Text="{Binding UI_CurrentPath}"/>
             <TextBox x:Name="SearchTextBox" Margin="2, 3" Grid.Column="2" Text="{Binding SearchTextBox, Mode=TwoWay}"/>
         </Grid>
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*" MinWidth="70"/>
                 <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="6*"/>
+                <ColumnDefinition Width="6*" MinWidth="350"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel>
@@ -74,13 +74,41 @@
             </StackPanel>
 
             <GridSplitter Grid.Column="1" Width="2" Background="DimGray" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
-            <DataGrid Grid.Column="2" />
+            
+            <DataGrid x:Name="DataGrid" Grid.Column="2"
+                      ItemsSource="{Binding FoledrsAndFiles}" AutoGenerateColumns="False"
+                      GridLinesVisibility="Horizontal" SelectionMode="Single"
+                      HorizontalGridLinesBrush="#FFF7F7F7" CanUserResizeRows="False"
+                      SelectionUnit="FullRow" BorderBrush="White"
+                      Background="White" IsReadOnly="True"
+                      CanUserAddRows="False" CanUserDeleteRows="False">
 
-            <TreeView x:Name="MainTreeView" Grid.Column="0" ItemsSource="{Binding MainTreeView}" FontSize="16" GotFocus="{Binding MouseDoubleClick}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:InvokeCommandAction Command="{Binding DataGrid_DoubleClick}"  CommandParameter="{Binding ElementName=DataGrid,Path=SelectedItem}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}"/>
+                    <DataGridTextColumn Header="Extention" IsReadOnly="True" Binding="{Binding Extention}"/>
+                    <DataGridTextColumn Header="CreationTime" IsReadOnly="True" Binding="{Binding CreationTime}"/>
+                    <DataGridTextColumn Header="LastAccessTime" IsReadOnly="True" Binding="{Binding LastAccessTime}"/>
+                    <DataGridTextColumn Header="LastWriteTime" IsReadOnly="True" Binding="{Binding LastWriteTime}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <TreeView x:Name="MainTreeView" Grid.Column="0" FontSize="16" ItemsSource="{Binding Drives}" BorderBrush="White">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:InvokeCommandAction Command="{Binding MainTreeView_SelectedItemChanged}" CommandParameter="{Binding ElementName=MainTreeView,Path=SelectedItem}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+
                 <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Name}">
-                        <TextBlock Text="{Binding Name}" />
-                    </HierarchicalDataTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
 

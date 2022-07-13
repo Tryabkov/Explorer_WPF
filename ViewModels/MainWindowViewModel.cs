@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -8,9 +9,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Explorer_WPF.Models;
-using static Explorer_WPF.Models.MainHierarchy;
+using Explorer_WPF.Models.AbstractClasses;
 
 namespace Explorer_WPF.ViewModels
 {
@@ -21,10 +23,12 @@ namespace Explorer_WPF.ViewModels
         #endregion
 
         #region Program fields
-        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set{ Paths.currentPath = value; } }
-        private List<string> _upPath { get { return Paths.upPath; } set { Paths.upPath = value; } }
-        private List<string> _previousPath { get { return Paths.previousPath; } set { Paths.previousPath = value; } }
-        private List<string> _futurePath { get { return Paths.futurePath; } set { Paths.futurePath = value; } }
+        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set{ Set(ref Paths.currentPath, value); } }
+        private List<string> _upPath { get { return Paths.upPath; } set { Set(ref Paths.upPath, value); } }
+        private List<string> _previousPath { get { return Paths.previousPath; } set { Set(ref Paths.previousPath, value); } }
+        private List<string> _futurePath { get { return Paths.futurePath; } set { Set(ref Paths.futurePath, value); } }
+        private List<string> _folders;
+        private List<string> _files;
         #endregion
 
         #region UI fields
@@ -35,8 +39,12 @@ namespace Explorer_WPF.ViewModels
         private string _searchTextBox;
         public string SearchTextBox { get { return _searchTextBox; } set { Set(ref _searchTextBox, value); OnPropertyChanged(); } }
 
-        private ObservableCollection<Drive> _mainTreeView = new ObservableCollection<Drive>();
-        public ObservableCollection<Drive> MainTreeView { get { return _mainTreeView; } private set { Set(ref _mainTreeView, value); OnPropertyChanged(); } }
+        private ObservableCollection<Drive> _drives = new ObservableCollection<Drive>();
+        public ObservableCollection<Drive> Drives { get { return _drives; } private set { Set(ref _drives, value); OnPropertyChanged(); } }
+
+        private ObservableCollection<FolderItem> _foldersAndFiles = new ObservableCollection<FolderItem>();
+        public ObservableCollection<FolderItem> FoledrsAndFiles { get { return _foldersAndFiles; } set { Set(ref _foldersAndFiles, value); OnPropertyChanged(); } }
+
         #endregion
         public MainWindowViewModel()
         {
@@ -48,22 +56,33 @@ namespace Explorer_WPF.ViewModels
             _previousPath = new List<string>();
             _futurePath = new List<string>();
             #endregion
-
             Paths.currentPath.CollectionChanged += PathValueChanged;
             Update();
         }
 
         private void Update()
         {
-            MainTreeView = FIleOperartor.GetDrives();
+            FIleOperartor.Update(ListToString(_currentPath));
+            Drives = FIleOperartor.Drives;
+
+            var foledrsAndFiles = new ObservableCollection<FolderItem>();
+
+            foreach (var item in FIleOperartor.Folders)
+            {
+                foledrsAndFiles.Add(item);
+            }
+            foreach (var item in FIleOperartor.Files)
+            {
+                foledrsAndFiles.Add(item);
+            }
+            FoledrsAndFiles = foledrsAndFiles;
         }
 
-        private string ListToString(ICollection<string> list)
+        private string ListToString(IList<string> list)
         {
             string str = string.Empty;
             foreach (var item in list)
             {
-                ObservableCollection<string> cp = new ObservableCollection<string>();
                 str += item;
             }
             return str;
@@ -71,10 +90,19 @@ namespace Explorer_WPF.ViewModels
 
         private void PathValueChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            UI_CurrentPath = ListToString(Paths.currentPath);
+            UI_CurrentPath = ListToString(Paths.currentPath) + @"\";
+            try
+            {
+                Update();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("Access locked", caption: "Warning", button: MessageBoxButton.OK, icon: MessageBoxImage.Warning);
+                _currentPath.RemoveAt(_currentPath.Count - 1);
+            }
         }
 
-        #region Button`s commads
+        #region Commads
         public ICommand UpButton_Click
         {
             get
@@ -108,17 +136,42 @@ namespace Explorer_WPF.ViewModels
             }
         }
 
-        public ICommand MouseDoubleClick
+        public ICommand MainTreeView_SelectedItemChanged
         {
             get
             {
                 return new DelegateCommand((obj) =>
                 {
-
+                    var name = ((Drive)obj)?.Information.Name;
+                    if (name != null)
+                    {
+                        _currentPath.Clear();
+                        _currentPath.Add(name);
+                    }
                 });
             }
         }
 
+        public ICommand DataGrid_DoubleClick
+        {
+            get
+            {
+                return new DelegateCommand((obj) =>
+                {
+                    if (obj != null)
+                    {
+                        if (((FolderItem)obj).IsFile) ((File)obj).Open();
+
+                        else
+                        {
+                            if (_currentPath.Count == 1)  _currentPath.Add(((Folder)obj).Name);
+
+                            else _currentPath.Add(@"\" + ((Folder)obj).Name);                           
+                        }
+                    }
+                });
+            }
+        }
 
         #endregion
     }
