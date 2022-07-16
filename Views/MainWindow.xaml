@@ -55,7 +55,11 @@
                     </Button.Background>
                 </Button>
 
-                <Button x:Name="UpButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" Command="{Binding UpButton_Click}" />
+                <Button x:Name="UpButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" Command="{Binding UpButton_Click}" >
+                    <Button.Background>
+                        <ImageBrush ImageSource="/resourses/UpArrow.png"/>
+                    </Button.Background>
+                </Button>
             </StackPanel>
 
             <TextBlock x:Name="PathTextBlock" Margin="24,2,2,2" Grid.Column="1" FontSize="22" TextAlignment="Left" Text="{Binding UI_CurrentPath}"/>
@@ -74,7 +78,7 @@
             </StackPanel>
 
             <GridSplitter Grid.Column="1" Width="2" Background="DimGray" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
-            
+
             <DataGrid x:Name="DataGrid" Grid.Column="2"
                       ItemsSource="{Binding FoledrsAndFiles}" AutoGenerateColumns="False"
                       GridLinesVisibility="Horizontal" SelectionMode="Single"

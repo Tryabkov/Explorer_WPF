@@ -21,7 +21,7 @@ namespace Explorer_WPF.Models
 
         private string GetName(string path)
         {
-            return path.Substring(path.LastIndexOf(@"\") + 1, path.LastIndexOf('.') - 3);
+            return path.Substring(path.LastIndexOf(@"\") + 1, path.LastIndexOf('.') - (path.LastIndexOf(@"\") + 1));            
         }
 
         private string GetExtension(string path)

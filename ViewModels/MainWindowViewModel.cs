@@ -23,7 +23,7 @@ namespace Explorer_WPF.ViewModels
         #endregion
 
         #region Program fields
-        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set{ Set(ref Paths.currentPath, value); } }
+        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set{} }
         private List<string> _upPath { get { return Paths.upPath; } set { Set(ref Paths.upPath, value); } }
         private List<string> _previousPath { get { return Paths.previousPath; } set { Set(ref Paths.previousPath, value); } }
         private List<string> _futurePath { get { return Paths.futurePath; } set { Set(ref Paths.futurePath, value); } }
@@ -90,7 +90,7 @@ namespace Explorer_WPF.ViewModels
 
         private void PathValueChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            UI_CurrentPath = ListToString(Paths.currentPath) + @"\";
+            UI_CurrentPath = ListToString(Paths.currentPath);
             try
             {
                 Update();
@@ -120,7 +120,7 @@ namespace Explorer_WPF.ViewModels
             {
                 return new DelegateCommand((obj) =>
                 {
-                    _currentPath.Add("1");
+                    
                 }, (obj) => _futurePath.Count != 0);
             }
         }
@@ -131,7 +131,7 @@ namespace Explorer_WPF.ViewModels
             {
                 return new DelegateCommand((obj) =>
                 {
-
+                    _upPath.Clear();
                 }, (obj) => _previousPath.Count != 0);
             }
         }
@@ -164,9 +164,9 @@ namespace Explorer_WPF.ViewModels
 
                         else
                         {
-                            if (_currentPath.Count == 1)  _currentPath.Add(((Folder)obj).Name);
+                            if (_currentPath.Count == 1)  _currentPath.Add(((Folder)obj).Name + @"\");
 
-                            else _currentPath.Add(@"\" + ((Folder)obj).Name);                           
+                            else _currentPath.Add(((Folder)obj).Name + @"\");                           
                         }
                     }
                 });

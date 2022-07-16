@@ -15,26 +15,29 @@ namespace Explorer_WPF.Models
         public List<string> previousPath = new List<string>();
         public List<string> upPath = new List<string>();
         public List<string> futurePath = new List<string>();
-        private List<List<string>> _pathHistory = new List<List<string>>();
+        private List<Collection<string>> _pathHistory = new List<Collection<string>>();
         private int _pathHistoryIndex = 0;
         #endregion
 
         public Paths()
         {
-            currentPath.CollectionChanged += UpdatePaths;
+            currentPath.CollectionChanged += CurrentPathChanged;
         }
 
-        private void UpdatePaths(object? sender, NotifyCollectionChangedEventArgs e)
+        private void CurrentPathChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            _pathHistory.Add(currentPath);
+            _pathHistoryIndex++;
+
             previousPath.Clear();
             if (_pathHistory?.Count >= 2 && _pathHistory.Count > _pathHistoryIndex)
             {
-                previousPath = _pathHistory[_pathHistoryIndex --];
+                previousPath = new(_pathHistory[_pathHistoryIndex - 1]);
             }
             futurePath.Clear();
             if (_pathHistory?.Count >= 2 && _pathHistory.Count > _pathHistoryIndex)
             {
-                futurePath = _pathHistory[_pathHistoryIndex ++];
+                futurePath = new(_pathHistory[_pathHistoryIndex + 1]);
             }
 
             upPath.Clear();
