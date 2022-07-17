@@ -16,34 +16,40 @@ namespace Explorer_WPF.Models
         public List<string> upPath = new List<string>();
         public List<string> futurePath = new List<string>();
         private List<Collection<string>> _pathHistory = new List<Collection<string>>();
-        private int _pathHistoryIndex = 0;
+        private int _pathHistoryIndex = -1;
         #endregion
 
         public Paths()
         {
-            currentPath.CollectionChanged += CurrentPathChanged;
+            //currentPath.CollectionChanged += CurrentPathChanged;
         }
 
-        private void CurrentPathChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        public void CurrentPathChanged()
         {
-            _pathHistory.Add(currentPath);
-            _pathHistoryIndex++;
-
+            if (currentPath.Count > 0)
+            {
+                var historyItem = new Collection<string>();
+                foreach (var item in currentPath)
+                {
+                    historyItem.Add(item);
+                }
+                _pathHistory.Add(historyItem);
+                _pathHistoryIndex++;
+            }
             previousPath.Clear();
             if (_pathHistory?.Count >= 2 && _pathHistory.Count > _pathHistoryIndex)
             {
                 previousPath = new(_pathHistory[_pathHistoryIndex - 1]);
             }
             futurePath.Clear();
-            if (_pathHistory?.Count >= 2 && _pathHistory.Count > _pathHistoryIndex)
+            if (_pathHistory?.Count >= 2 && _pathHistory.Count - 1 > _pathHistoryIndex)
             {
                 futurePath = new(_pathHistory[_pathHistoryIndex + 1]);
             }
-
             upPath.Clear();
             if (currentPath.Count >= 2)
             {
-                for (int i = 0; i < currentPath.Count - 2; i++)
+                for (int i = 0; i < currentPath.Count - 1; i++)
                 {
                     upPath?.Add(currentPath[i]);
                 }

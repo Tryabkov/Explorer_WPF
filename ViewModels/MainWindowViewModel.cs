@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Explorer_WPF.Models;
@@ -23,12 +16,7 @@ namespace Explorer_WPF.ViewModels
         #endregion
 
         #region Program fields
-        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set{} }
-        private List<string> _upPath { get { return Paths.upPath; } set { Set(ref Paths.upPath, value); } }
-        private List<string> _previousPath { get { return Paths.previousPath; } set { Set(ref Paths.previousPath, value); } }
-        private List<string> _futurePath { get { return Paths.futurePath; } set { Set(ref Paths.futurePath, value); } }
-        private List<string> _folders;
-        private List<string> _files;
+
         #endregion
 
         #region UI fields
@@ -51,18 +39,14 @@ namespace Explorer_WPF.ViewModels
             #region Setting values
             _UI_CurrentPath = string.Empty;
             _searchTextBox = string.Empty;
-            _currentPath = new ObservableCollection<string>();
-            _upPath = new List<string>();
-            _previousPath = new List<string>();
-            _futurePath = new List<string>();
             #endregion
-            Paths.currentPath.CollectionChanged += PathValueChanged;
+            //Paths.currentPath.CollectionChanged += PathValueChanged;
             Update();
         }
 
         private void Update()
         {
-            FIleOperartor.Update(ListToString(_currentPath));
+            FIleOperartor.Update(ListToString(Paths.currentPath));
             Drives = FIleOperartor.Drives;
 
             var foledrsAndFiles = new ObservableCollection<FolderItem>();
@@ -78,16 +62,6 @@ namespace Explorer_WPF.ViewModels
             FoledrsAndFiles = foledrsAndFiles;
         }
 
-        private string ListToString(IList<string> list)
-        {
-            string str = string.Empty;
-            foreach (var item in list)
-            {
-                str += item;
-            }
-            return str;
-        }
-
         private void PathValueChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             UI_CurrentPath = ListToString(Paths.currentPath);
@@ -98,8 +72,25 @@ namespace Explorer_WPF.ViewModels
             catch (UnauthorizedAccessException)
             {
                 MessageBox.Show("Access locked", caption: "Warning", button: MessageBoxButton.OK, icon: MessageBoxImage.Warning);
-                _currentPath.RemoveAt(_currentPath.Count - 1);
+                Paths.currentPath.RemoveAt(Paths.currentPath.Count - 1);
+                //TODO: also remove in pathHisory ande index
             }
+        }
+
+        private string ListToString(IList<string> list)
+        {
+            string str = string.Empty;
+            foreach (var item in list)
+            {
+                str += item;
+            }
+            return str;
+        }
+
+        private void CurrentPathChanged()
+        {
+            Paths.CurrentPathChanged();
+            Update();
         }
 
         #region Commads
@@ -109,8 +100,16 @@ namespace Explorer_WPF.ViewModels
             {
                 return new DelegateCommand((obj) =>
                 {
+                    Paths.currentPath.Clear();
+                    for (int i = 0; i < Paths.upPath.Count; i++)
+                    {
+                        Paths.currentPath.Add(Paths.upPath[i]);
+                    }
+                    CurrentPathChanged();
+                    //var lastCurrentPathItem = Paths.upPath[Paths.upPath.Count - 1];
+                    /*Paths.currentPath.Add(lastCurrentPathItem); *///this crutch is needed because observable collection doesn`t see changes 
 
-                }, (obj) => _upPath.Count != 0);
+                }, (obj) => Paths.upPath.Count != 0);
             }
         }
 
@@ -120,8 +119,8 @@ namespace Explorer_WPF.ViewModels
             {
                 return new DelegateCommand((obj) =>
                 {
-                    
-                }, (obj) => _futurePath.Count != 0);
+
+                }, (obj) => Paths.futurePath.Count != 0);
             }
         }
 
@@ -131,8 +130,8 @@ namespace Explorer_WPF.ViewModels
             {
                 return new DelegateCommand((obj) =>
                 {
-                    _upPath.Clear();
-                }, (obj) => _previousPath.Count != 0);
+
+                }, (obj) => Paths.previousPath.Count != 0);
             }
         }
 
@@ -145,8 +144,9 @@ namespace Explorer_WPF.ViewModels
                     var name = ((Drive)obj)?.Information.Name;
                     if (name != null)
                     {
-                        _currentPath.Clear();
-                        _currentPath.Add(name);
+                        Paths.currentPath.Clear();
+                        Paths.currentPath.Add(name);
+                        CurrentPathChanged();
                     }
                 });
             }
@@ -164,15 +164,16 @@ namespace Explorer_WPF.ViewModels
 
                         else
                         {
-                            if (_currentPath.Count == 1)  _currentPath.Add(((Folder)obj).Name + @"\");
+                            if (Paths.currentPath.Count == 1) Paths.currentPath.Add(((Folder)obj).Name + @"\");
 
-                            else _currentPath.Add(((Folder)obj).Name + @"\");                           
+                            else Paths.currentPath.Add(((Folder)obj).Name + @"\");
+
+                            CurrentPathChanged();
                         }
                     }
                 });
             }
         }
-
         #endregion
     }
 }
