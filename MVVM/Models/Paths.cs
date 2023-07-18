@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Explorer_WPF.Models
+namespace Explorer_WPF.MVVM.Models
 {
     internal struct Paths
     {

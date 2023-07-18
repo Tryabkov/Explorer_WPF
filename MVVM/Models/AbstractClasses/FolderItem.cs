@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Explorer_WPF.Models.AbstractClasses
+namespace Explorer_WPF.MVVM.Models.AbstractClasses
 {
     internal class FolderItem
     {

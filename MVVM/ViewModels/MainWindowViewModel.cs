@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using Explorer_WPF.Models;
-using Explorer_WPF.Models.AbstractClasses;
+using Explorer_WPF.MVVM.Core;
+using Explorer_WPF.MVVM.Models;
+using Explorer_WPF.MVVM.Models.AbstractClasses;
+using static Explorer_WPF.MVVM.Models.MainHierarchy;
 
-namespace Explorer_WPF.ViewModels
+namespace Explorer_WPF.MVVM.ViewModels
 {
     internal class MainWindowViewModel : Base.ViewModel
     {
@@ -23,7 +18,7 @@ namespace Explorer_WPF.ViewModels
         #endregion
 
         #region Program fields
-        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set{} }
+        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set { } }
         private List<string> _upPath { get { return Paths.upPath; } set { Set(ref Paths.upPath, value); } }
         private List<string> _previousPath { get { return Paths.previousPath; } set { Set(ref Paths.previousPath, value); } }
         private List<string> _futurePath { get { return Paths.futurePath; } set { Set(ref Paths.futurePath, value); } }
@@ -33,18 +28,21 @@ namespace Explorer_WPF.ViewModels
 
         #region UI fields
 
-        private string _UI_CurrentPath;
+        //TODO: Remove OpPropChan where is Set
         public string UI_CurrentPath { get { return _UI_CurrentPath; } set { Set(ref _UI_CurrentPath, value); OnPropertyChanged(); } }
+        private string _UI_CurrentPath;
 
-        private string _searchTextBox;
         public string SearchTextBox { get { return _searchTextBox; } set { Set(ref _searchTextBox, value); OnPropertyChanged(); } }
+        private string _searchTextBox;
 
-        private ObservableCollection<Drive> _drives = new ObservableCollection<Drive>();
         public ObservableCollection<Drive> Drives { get { return _drives; } private set { Set(ref _drives, value); OnPropertyChanged(); } }
+        private ObservableCollection<Drive> _drives = new ObservableCollection<Drive>();
 
-        private ObservableCollection<FolderItem> _foldersAndFiles = new ObservableCollection<FolderItem>();
         public ObservableCollection<FolderItem> FoledrsAndFiles { get { return _foldersAndFiles; } set { Set(ref _foldersAndFiles, value); OnPropertyChanged(); } }
+        private ObservableCollection<FolderItem> _foldersAndFiles = new ObservableCollection<FolderItem>();
 
+        public ObservableCollection<Node> Hierarchy { get => _hierarchy;}
+        ObservableCollection<Node> _hierarchy = new MainHierarchy().nodes;
         #endregion
         public MainWindowViewModel()
         {
@@ -56,6 +54,7 @@ namespace Explorer_WPF.ViewModels
             _previousPath = new List<string>();
             _futurePath = new List<string>();
             #endregion
+
             Paths.currentPath.CollectionChanged += PathValueChanged;
             Update();
         }
@@ -102,7 +101,7 @@ namespace Explorer_WPF.ViewModels
             }
         }
 
-        #region Commads
+        #region Commands
         public ICommand UpButton_Click
         {
             get
@@ -120,7 +119,7 @@ namespace Explorer_WPF.ViewModels
             {
                 return new DelegateCommand((obj) =>
                 {
-                    
+
                 }, (obj) => _futurePath.Count != 0);
             }
         }
@@ -164,9 +163,9 @@ namespace Explorer_WPF.ViewModels
 
                         else
                         {
-                            if (_currentPath.Count == 1)  _currentPath.Add(((Folder)obj).Name + @"\");
+                            if (_currentPath.Count == 1) _currentPath.Add(((Folder)obj).Name + @"\");
 
-                            else _currentPath.Add(((Folder)obj).Name + @"\");                           
+                            else _currentPath.Add(((Folder)obj).Name + @"\");
                         }
                     }
                 });

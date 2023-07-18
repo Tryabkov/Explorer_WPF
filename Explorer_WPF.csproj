@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MVVM\Models\Interfaces\**" />
+    <EmbeddedResource Remove="MVVM\Models\Interfaces\**" />
+    <None Remove="MVVM\Models\Interfaces\**" />
+    <Page Remove="MVVM\Models\Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="resourses\LeftArrow.png" />
     <None Remove="resourses\RightArrow.png" />
     <None Remove="resourses\UpArrow.png" />
@@ -20,13 +27,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="resourses\LeftArrow.png" />
+    <Resource Include="resourses\LeftArrow.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="resourses\RightArrow.png" />
     <Resource Include="resourses\UpArrow.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Interfaces\" />
   </ItemGroup>
 
 </Project>

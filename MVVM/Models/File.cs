@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Explorer_WPF.Models.AbstractClasses;
+using Explorer_WPF.MVVM.Models.AbstractClasses;
 
-namespace Explorer_WPF.Models
+namespace Explorer_WPF.MVVM.Models
 {
     internal class File : FolderItem
     {
@@ -21,7 +21,7 @@ namespace Explorer_WPF.Models
 
         private string GetName(string path)
         {
-            return path.Substring(path.LastIndexOf(@"\") + 1, path.LastIndexOf('.') - (path.LastIndexOf(@"\") + 1));            
+            return path.Substring(path.LastIndexOf(@"\") + 1, path.LastIndexOf('.') - (path.LastIndexOf(@"\") + 1));
         }
 
         private string GetExtension(string path)
@@ -40,9 +40,9 @@ namespace Explorer_WPF.Models
             }
             catch (Exception)
             {
-                MessageBox.Show("File can`t be open", "Warning", button:MessageBoxButton.OK, icon:MessageBoxImage.Warning);
+                MessageBox.Show("File can`t be open", "Warning", button: MessageBoxButton.OK, icon: MessageBoxImage.Warning);
             }
-            
+
         }
     }
 }

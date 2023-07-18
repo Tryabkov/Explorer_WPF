@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Explorer_WPF.ViewModels.Base
+namespace Explorer_WPF.MVVM.ViewModels.Base
 {
-    internal abstract class ViewModel: INotifyPropertyChanged
+    internal abstract class ViewModel : INotifyPropertyChanged
     {
         #region Events
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -21,7 +21,7 @@ namespace Explorer_WPF.ViewModels.Base
 
         protected virtual bool Set<T>(ref T field, T value, [CallerMemberName] string PropertyName = null)
         {
-            if(Equals(field, value)) return false;
+            if (Equals(field, value)) return false;
             field = value;
             OnPropertyChanged(PropertyName);
             return true;

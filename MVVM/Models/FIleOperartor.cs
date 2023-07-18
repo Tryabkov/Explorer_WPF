@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Explorer_WPF.ViewModels;
+using Explorer_WPF.MVVM.ViewModels;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Windows;
 
-namespace Explorer_WPF.Models
+namespace Explorer_WPF.MVVM.Models
 {
     internal class FIleOperartor
     {
@@ -22,7 +22,7 @@ namespace Explorer_WPF.Models
 
         public static void Update(string path)
         {
-            UpdateDrives();             
+            UpdateDrives();
             UpdateFolders(path);
             UpdateFiles(path);
         }
@@ -62,14 +62,14 @@ namespace Explorer_WPF.Models
                         Files.Add(new File(item));
                     }
                     catch (Exception)
-                    {                      
+                    {
                     }
-                } 
+                }
             }
         }
 
         private static void ArrayToList(Array array, IList list)
-        {   
+        {
             list.Clear();
             foreach (var item in array)
             {

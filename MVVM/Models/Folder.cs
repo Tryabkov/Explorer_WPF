@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Explorer_WPF.Models.AbstractClasses;
+using Explorer_WPF.MVVM.Models.AbstractClasses;
 
-namespace Explorer_WPF.Models
+namespace Explorer_WPF.MVVM.Models
 {
     internal class Folder : FolderItem
     {

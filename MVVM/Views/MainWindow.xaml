@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Explorer_WPF"
-        xmlns:viewmodels="clr-namespace:Explorer_WPF.ViewModels"
+        xmlns:viewmodels="clr-namespace:Explorer_WPF.MVVM.ViewModels"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" MinHeight="250" MinWidth="400" WindowStartupLocation="CenterScreen">
@@ -13,6 +13,7 @@
         <viewmodels:MainWindowViewModel/>
     </Window.DataContext>
 
+    <!--#region Resourses-->
     <Window.Resources>
         <Style x:Key="MoveButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="25"/>
@@ -21,8 +22,13 @@
             <Setter Property="Background"  Value="White"/>
             <Setter Property="BorderBrush"  Value="White"/>
         </Style>
-    </Window.Resources>
 
+        <Image x:Key="LeftArrow" Source="/resourses/LeftArrow.png"/>
+        <Image x:Key="RightArrow" Source="/resourses/RightArrow.png"/>
+        <Image x:Key="UpArrow" Source="/resourses/UpArrow.png"/>
+    </Window.Resources>
+    <!--#endregion-->
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -42,26 +48,19 @@
                 <ColumnDefinition Width="230"/>
             </Grid.ColumnDefinitions>
 
+            <!--#region Arrows-->
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="BackButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" Command="{Binding BackButton_Click}">
-                    <Button.Background>
-                        <ImageBrush ImageSource="/resourses/LeftArrow.png"/>
-                    </Button.Background>
-                </Button>
+                <Button x:Name="BackButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" 
+                        Command="{Binding BackButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource LeftArrow}}"/>
 
-                <Button x:Name="ForwardButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" Command="{Binding ForwardButton_Click}">
-                    <Button.Background>
-                        <ImageBrush ImageSource="/resourses/RightArrow.png"/>
-                    </Button.Background>
-                </Button>
+                <Button x:Name="ForwardButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}"
+                        Command="{Binding ForwardButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource RightArrow}}"/>
 
-                <Button x:Name="UpButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" Command="{Binding UpButton_Click}" >
-                    <Button.Background>
-                        <ImageBrush ImageSource="/resourses/UpArrow.png"/>
-                    </Button.Background>
-                </Button>
+                <Button x:Name="UpButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}"
+                        Command="{Binding UpButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource UpArrow}}"/>
             </StackPanel>
-
+            <!--#endregion-->
+            
             <TextBlock x:Name="PathTextBlock" Margin="24,2,2,2" Grid.Column="1" FontSize="22" TextAlignment="Left" Text="{Binding UI_CurrentPath}"/>
             <TextBox x:Name="SearchTextBox" Margin="2, 3" Grid.Column="2" Text="{Binding SearchTextBox, Mode=TwoWay}"/>
         </Grid>
@@ -72,10 +71,6 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="6*" MinWidth="350"/>
             </Grid.ColumnDefinitions>
-
-            <StackPanel>
-
-            </StackPanel>
 
             <GridSplitter Grid.Column="1" Width="2" Background="DimGray" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
@@ -115,7 +110,6 @@
                     </DataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
-
 
         </Grid>
 
