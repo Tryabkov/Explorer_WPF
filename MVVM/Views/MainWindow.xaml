@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Explorer_WPF"
         xmlns:viewmodels="clr-namespace:Explorer_WPF.MVVM.ViewModels"
-        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" MinHeight="250" MinWidth="400" WindowStartupLocation="CenterScreen">
 
@@ -75,18 +75,18 @@
             <GridSplitter Grid.Column="1" Width="2" Background="DimGray" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
             <DataGrid x:Name="DataGrid" Grid.Column="2"
-                      ItemsSource="{Binding FoledrsAndFiles}" AutoGenerateColumns="False"
+                      AutoGenerateColumns="False"
                       GridLinesVisibility="Horizontal" SelectionMode="Single"
                       HorizontalGridLinesBrush="#FFF7F7F7" CanUserResizeRows="False"
                       SelectionUnit="FullRow" BorderBrush="White"
                       Background="White" IsReadOnly="True"
                       CanUserAddRows="False" CanUserDeleteRows="False">
 
-                <i:Interaction.Triggers>
+                <!--<i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
                         <i:InvokeCommandAction Command="{Binding DataGrid_DoubleClick}"  CommandParameter="{Binding ElementName=DataGrid,Path=SelectedItem}"/>
                     </i:EventTrigger>
-                </i:Interaction.Triggers>
+                </i:Interaction.Triggers>-->
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}"/>
@@ -97,22 +97,25 @@
                 </DataGrid.Columns>
             </DataGrid>
 
-            <TreeView x:Name="MainTreeView" Grid.Column="0" FontSize="16" ItemsSource="{Binding Drives}" BorderBrush="White">
-                <i:Interaction.Triggers>
+            <ContentControl Grid.Column="0"
+                          Content="{Binding FileStructure}"
+                          BorderBrush="White">
+                <!--<i:Interaction.Triggers>
                     <i:EventTrigger EventName="SelectedItemChanged">
                         <i:InvokeCommandAction Command="{Binding MainTreeView_SelectedItemChanged}" CommandParameter="{Binding ElementName=MainTreeView,Path=SelectedItem}"/>
                     </i:EventTrigger>
-                </i:Interaction.Triggers>
-
-                <TreeView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding Name}"/>
-                    </DataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-
+                </i:Interaction.Triggers>-->
+            </ContentControl>
         </Grid>
 
+        <TreeView Visibility="Collapsed">
+            <TreeViewItem>
+                <TreeViewItem>
+                    <TreeViewItem />
+                </TreeViewItem>
+            </TreeViewItem>
+        </TreeView>
+        
         <StackPanel Orientation="Horizontal" Grid.Row="3">
 
         </StackPanel>

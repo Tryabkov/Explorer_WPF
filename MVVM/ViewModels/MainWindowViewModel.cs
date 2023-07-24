@@ -2,176 +2,147 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using Explorer_WPF.MVVM.Core;
 using Explorer_WPF.MVVM.Models;
 using Explorer_WPF.MVVM.Models.AbstractClasses;
-using static Explorer_WPF.MVVM.Models.MainHierarchy;
+using Microsoft.Xaml.Behaviors;
 
 namespace Explorer_WPF.MVVM.ViewModels
 {
     internal class MainWindowViewModel : Base.ViewModel
     {
-        #region New instanses
-        Paths Paths = new Paths();
-        #endregion
+        public TreeView FileStructure { get => _fileStructure; set => _fileStructure = value; }
+        public TreeView _fileStructure = new TreeView();
 
-        #region Program fields
-        private ObservableCollection<string> _currentPath { get { return Paths.currentPath; } set { } }
-        private List<string> _upPath { get { return Paths.upPath; } set { Set(ref Paths.upPath, value); } }
-        private List<string> _previousPath { get { return Paths.previousPath; } set { Set(ref Paths.previousPath, value); } }
-        private List<string> _futurePath { get { return Paths.futurePath; } set { Set(ref Paths.futurePath, value); } }
-        private List<string> _folders;
-        private List<string> _files;
-        #endregion
-
-        #region UI fields
-
-        //TODO: Remove OpPropChan where is Set
-        public string UI_CurrentPath { get { return _UI_CurrentPath; } set { Set(ref _UI_CurrentPath, value); OnPropertyChanged(); } }
-        private string _UI_CurrentPath;
-
-        public string SearchTextBox { get { return _searchTextBox; } set { Set(ref _searchTextBox, value); OnPropertyChanged(); } }
-        private string _searchTextBox;
-
-        public ObservableCollection<Drive> Drives { get { return _drives; } private set { Set(ref _drives, value); OnPropertyChanged(); } }
-        private ObservableCollection<Drive> _drives = new ObservableCollection<Drive>();
-
-        public ObservableCollection<FolderItem> FoledrsAndFiles { get { return _foldersAndFiles; } set { Set(ref _foldersAndFiles, value); OnPropertyChanged(); } }
-        private ObservableCollection<FolderItem> _foldersAndFiles = new ObservableCollection<FolderItem>();
-
-        public ObservableCollection<Node> Hierarchy { get => _hierarchy;}
-        ObservableCollection<Node> _hierarchy = new MainHierarchy().nodes;
-        #endregion
+        private bool _isTimerActive = false;
         public MainWindowViewModel()
         {
-            #region Setting values
-            _UI_CurrentPath = string.Empty;
-            _searchTextBox = string.Empty;
-            _currentPath = new ObservableCollection<string>();
-            _upPath = new List<string>();
-            _previousPath = new List<string>();
-            _futurePath = new List<string>();
-            #endregion
-
-            Paths.currentPath.CollectionChanged += PathValueChanged;
-            Update();
+            _fileStructure.Name = "MainTreeView";
+            SetTreeViewTriggers(_fileStructure);
+            AddDrivesToFileStructure();
+            
         }
 
-        private void Update()
+        void SetTreeViewTriggers(Control contentControl)
         {
-            FIleOperartor.Update(ListToString(_currentPath));
-            Drives = FIleOperartor.Drives;
+            // create the command action and bind the command to it
+            var invokeCommandAction = new InvokeCommandAction { CommandParameter = "" };
+            var binding = new Binding { Path = new PropertyPath("TreeView_SelectedItemChanged") };
+            BindingOperations.SetBinding(invokeCommandAction, InvokeCommandAction.CommandProperty, binding);
 
-            var foledrsAndFiles = new ObservableCollection<FolderItem>();
+            // create the event trigger and add the command action to it
+            var eventTrigger = new Microsoft.Xaml.Behaviors.EventTrigger { EventName = "SelectedItemChanged" };
+            eventTrigger.Actions.Add(invokeCommandAction);
 
-            foreach (var item in FIleOperartor.Folders)
-            {
-                foledrsAndFiles.Add(item);
-            }
-            foreach (var item in FIleOperartor.Files)
-            {
-                foledrsAndFiles.Add(item);
-            }
-            FoledrsAndFiles = foledrsAndFiles;
+            // attach the trigger to the control
+            var triggers = Interaction.GetTriggers(contentControl);
+            triggers.Add(eventTrigger);
         }
 
-        private string ListToString(IList<string> list)
+        void SetTreeViewItemTriggers(Control contentControl)
         {
-            string str = string.Empty;
-            foreach (var item in list)
-            {
-                str += item;
-            }
-            return str;
+            var b = new Binding("RelativeSource={RelativeSource Self}}");
+
+            var invokeCommandAction = new InvokeCommandAction { CommandParameter = "" };
+            var binding = new Binding { Path = new PropertyPath("TreeViewItem_Expanded") };
+            BindingOperations.SetBinding(invokeCommandAction, InvokeCommandAction.CommandProperty, binding);
+
+            var eventTrigger = new Microsoft.Xaml.Behaviors.EventTrigger { EventName = "Expanded" };
+            eventTrigger.Actions.Add(invokeCommandAction);
+
+            var triggers = Interaction.GetTriggers(contentControl);
+            triggers.Add(eventTrigger);
+
+
+            invokeCommandAction = new InvokeCommandAction { CommandParameter = "BackButton " };
+            binding = new Binding { Path = new PropertyPath("TreeViewItem_Collapsed") };
+            BindingOperations.SetBinding(invokeCommandAction, InvokeCommandAction.CommandProperty, binding);
+
+            eventTrigger = new Microsoft.Xaml.Behaviors.EventTrigger { EventName = "Collapsed" };
+            eventTrigger.Actions.Add(invokeCommandAction);
+
+            triggers = Interaction.GetTriggers(contentControl);
+            triggers.Add(eventTrigger);
         }
 
-        private void PathValueChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void AddDrivesToFileStructure()
         {
-            UI_CurrentPath = ListToString(Paths.currentPath);
-            try
+            string[] drives = FIleOperartor.GetDrives();
+            foreach (var drive in drives)
             {
-                Update();
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("Access locked", caption: "Warning", button: MessageBoxButton.OK, icon: MessageBoxImage.Warning);
-                _currentPath.RemoveAt(_currentPath.Count - 1);
+                var item = new TreeViewDriveItem(drive);
+                item.Items.Add(new TreeViewFolderItem("")); //For small arrow to the left of header
+                FileStructure.Items.Add(item);
+                
+                ItemCreated(item);
             }
         }
 
-        #region Commands
-        public ICommand UpButton_Click
+        private void AddFoldersToItem(TreeViewStorageItem item)
+        {
+            string[] Folders = FIleOperartor.GetFolders(item.Path);
+            foreach (var folder in Folders)
+            {
+                var newItem = new TreeViewFolderItem(folder);
+                if (FIleOperartor.GetFolders(folder).Length > 0)
+                {
+                    newItem.Items.Add(new TreeViewFolderItem("")); //For small arrow to the left of header
+                }
+                item.Items.Add(newItem);
+
+                ItemCreated(newItem);
+            }
+        }
+
+        private void ItemCreated(TreeViewStorageItem item)
+        {
+            item.OnTreeViewStorageItemCollapced += TreeViewItem_Collapsed;
+            item.OnTreeViewStorageItemExpanded += TreeViewItem_Expanded;
+        }
+
+        public ICommand TreeView_SelectedItemChanged
         {
             get
             {
                 return new DelegateCommand((obj) =>
                 {
-
-                }, (obj) => _upPath.Count != 0);
+    
+                }/*, (obj) => _upPath.Count != 0*/);
             }
         }
 
-        public ICommand ForwardButton_Click
+        public void TreeViewItem_Expanded (object sender)
         {
-            get
+            var ExpandedItem = (TreeViewStorageItem)sender;
+            if (ExpandedItem.Items.Count > 0 && ((TreeViewStorageItem)ExpandedItem.Items[0]).Header == "") //It is necessary because method calls multiple times on one click
             {
-                return new DelegateCommand((obj) =>
-                {
-
-                }, (obj) => _futurePath.Count != 0);
+                ExpandedItem.Items.RemoveAt(0);
+                AddFoldersToItem(ExpandedItem);
             }
         }
 
-        public ICommand BackButton_Click
+        public async void TreeViewItem_Collapsed(object sender)
         {
-            get
+            if (!_isTimerActive)
             {
-                return new DelegateCommand((obj) =>
-                {
-                    _upPath.Clear();
-                }, (obj) => _previousPath.Count != 0);
+                var collapsedItem = (TreeViewStorageItem)sender;
+                int length = collapsedItem.Items.Count;
+                collapsedItem.Items.Clear();
+                collapsedItem.Items.Add(new TreeViewFolderItem(""));
+                await TimerAsync(1);
             }
         }
 
-        public ICommand MainTreeView_SelectedItemChanged
+        private async Task TimerAsync(int delay)
         {
-            get
-            {
-                return new DelegateCommand((obj) =>
-                {
-                    var name = ((Drive)obj)?.Information.Name;
-                    if (name != null)
-                    {
-                        _currentPath.Clear();
-                        _currentPath.Add(name);
-                    }
-                });
-            }
+            _isTimerActive = true;
+            await Task.Delay(delay);
+            _isTimerActive = false;
         }
-
-        public ICommand DataGrid_DoubleClick
-        {
-            get
-            {
-                return new DelegateCommand((obj) =>
-                {
-                    if (obj != null)
-                    {
-                        if (((FolderItem)obj).IsFile) ((File)obj).Open();
-
-                        else
-                        {
-                            if (_currentPath.Count == 1) _currentPath.Add(((Folder)obj).Name + @"\");
-
-                            else _currentPath.Add(((Folder)obj).Name + @"\");
-                        }
-                    }
-                });
-            }
-        }
-
-        #endregion
     }
 }

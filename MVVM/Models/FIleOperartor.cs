@@ -14,28 +14,35 @@ namespace Explorer_WPF.MVVM.Models
 {
     internal class FIleOperartor
     {
-        //private delegate EventHandler(List<string> previousPath, List<string> currentPath, List<string> futurePath, List<string> upPath, List<List<string>> pathHistory, ref int pathHistoryIndex);
-        //public static event EventHandler PathChanged;
         public static ObservableCollection<Drive> Drives = new ObservableCollection<Drive>();
         public static ObservableCollection<Folder> Folders = new ObservableCollection<Folder>();
         public static ObservableCollection<File> Files = new ObservableCollection<File>();
 
-        public static void Update(string path)
+        public static string[] GetDrives()
         {
-            UpdateDrives();
-            UpdateFolders(path);
-            UpdateFiles(path);
+            var drives = DriveInfo.GetDrives();
+            string[] result= new string[drives.Length];
+
+            for (int i = 0; i < drives.Length; i++)
+            {
+                result[i] = drives[i].Name;
+            }
+            return result;
         }
 
-        private static void UpdateDrives()
+        public static string[] GetFolders(string path)
         {
-            Drives.Clear();
+            string[] Folders;
 
-            DriveInfo[] drivesInfo = DriveInfo.GetDrives();
-            for (int i = 0; i < drivesInfo.Length; i++)
+            try
             {
-                Drives.Add(new Drive(drivesInfo[i].Name.Substring(0, drivesInfo[i].Name.Length - 1), drivesInfo[i]));
+                Folders = Directory.GetDirectories(path);
             }
+            catch (Exception)
+            {
+                return new string[0];
+            }
+            return Folders;
         }
 
         private static void UpdateFolders(string path)
