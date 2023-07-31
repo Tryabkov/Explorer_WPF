@@ -4,35 +4,31 @@ using System.Windows.Controls;
 
 namespace Explorer_WPF.MVVM.Models
 {
-    class TreeViewStorageItem : TreeViewItem
+    class TreeViewBaseItem : TreeViewItem
     {
-        public delegate void AccountHandler(TreeViewStorageItem sender);
+        public delegate void AccountHandler(TreeViewBaseItem sender);
 
         public event AccountHandler? OnTreeViewStorageItemCollapced;
         public event AccountHandler? OnTreeViewStorageItemExpanded;
 
         public string Path { get; set; }
 
-        private bool _isExpanded;
-
-        public TreeViewStorageItem(string path)
+        public TreeViewBaseItem(string path)
         {
             Path = path;
-            this.Collapsed += OnCollapsed;
-            this.Expanded += OnExpanded;
         }
 
         private void OnCollapsed(object sender, RoutedEventArgs e)
         {
-            OnTreeViewStorageItemCollapced.Invoke((TreeViewStorageItem)sender);
+            OnTreeViewStorageItemCollapced.Invoke((TreeViewBaseItem)sender);
         }
         private void OnExpanded(object sender, RoutedEventArgs e)
         {
-            OnTreeViewStorageItemExpanded.Invoke((TreeViewStorageItem)sender);
+            OnTreeViewStorageItemExpanded.Invoke((TreeViewBaseItem)sender);
         }
     }
 
-    class TreeViewDriveItem : TreeViewStorageItem
+    class TreeViewDriveItem : TreeViewBaseItem
     {
         public TreeViewDriveItem(string path) : base(path)
         {
@@ -40,7 +36,7 @@ namespace Explorer_WPF.MVVM.Models
         }
     }
 
-    class TreeViewFolderItem : TreeViewStorageItem
+    class TreeViewFolderItem : TreeViewBaseItem
     {
         public TreeViewFolderItem(string path) : base(path)
         {

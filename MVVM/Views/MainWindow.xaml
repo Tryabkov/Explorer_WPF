@@ -23,12 +23,12 @@
             <Setter Property="BorderBrush"  Value="White"/>
         </Style>
 
-        <Image x:Key="LeftArrow" Source="/resourses/LeftArrow.png"/>
-        <Image x:Key="RightArrow" Source="/resourses/RightArrow.png"/>
-        <Image x:Key="UpArrow" Source="/resourses/UpArrow.png"/>
+        <Image x:Key="LeftArrow" Source="/resources/ArrowLeft_IMG.png"/>
+        <Image x:Key="RightArrow" Source="/resources/ArrowRight_IMG.png"/>
+        <Image x:Key="UpArrow" Source="/resources/ArrowUp_IMG.png"/>
     </Window.Resources>
     <!--#endregion-->
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
@@ -60,7 +60,7 @@
                         Command="{Binding UpButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource UpArrow}}"/>
             </StackPanel>
             <!--#endregion-->
-            
+
             <TextBlock x:Name="PathTextBlock" Margin="24,2,2,2" Grid.Column="1" FontSize="22" TextAlignment="Left" Text="{Binding UI_CurrentPath}"/>
             <TextBox x:Name="SearchTextBox" Margin="2, 3" Grid.Column="2" Text="{Binding SearchTextBox, Mode=TwoWay}"/>
         </Grid>
@@ -74,48 +74,47 @@
 
             <GridSplitter Grid.Column="1" Width="2" Background="DimGray" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
 
-            <DataGrid x:Name="DataGrid" Grid.Column="2"
-                      AutoGenerateColumns="False"
-                      GridLinesVisibility="Horizontal" SelectionMode="Single"
-                      HorizontalGridLinesBrush="#FFF7F7F7" CanUserResizeRows="False"
-                      SelectionUnit="FullRow" BorderBrush="White"
+            <DataGrid x:Name="dataGrid" Grid.Column="2" GridLinesVisibility="Horizontal"
+                      SelectionMode="Single"
+                      HorizontalGridLinesBrush="#FFF7F7F7"
+                      BorderBrush="White"
                       Background="White" IsReadOnly="True"
-                      CanUserAddRows="False" CanUserDeleteRows="False">
+                      CanUserAddRows="False" CanUserDeleteRows="False"
+                      ItemsSource="{Binding FolderContent}" AutoGenerateColumns="False">
 
-                <!--<i:Interaction.Triggers>
+                <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
-                        <i:InvokeCommandAction Command="{Binding DataGrid_DoubleClick}"  CommandParameter="{Binding ElementName=DataGrid,Path=SelectedItem}"/>
+                        <i:InvokeCommandAction Command="{Binding DataGrid_DoubleClick}"
+                                           CommandParameter="{Binding SelectedItem, ElementName=dataGrid}"/>
                     </i:EventTrigger>
-                </i:Interaction.Triggers>-->
+                </i:Interaction.Triggers>
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}"/>
-                    <DataGridTextColumn Header="Extention" IsReadOnly="True" Binding="{Binding Extention}"/>
-                    <DataGridTextColumn Header="CreationTime" IsReadOnly="True" Binding="{Binding CreationTime}"/>
-                    <DataGridTextColumn Header="LastAccessTime" IsReadOnly="True" Binding="{Binding LastAccessTime}"/>
-                    <DataGridTextColumn Header="LastWriteTime" IsReadOnly="True" Binding="{Binding LastWriteTime}"/>
+                    <DataGridTemplateColumn IsReadOnly="True"/>
+
+                    <DataGridTemplateColumn Header="Name"     IsReadOnly="True"  Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <!--<Image Source="/resources/Folder_IMG.png"/>-->
+                                    <TextBlock Text="{Binding Name}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Type"     IsReadOnly="True" Binding="{Binding Type}"/>
+                    <DataGridTextColumn Header="Created"  IsReadOnly="True" Binding="{Binding Created}"/>
+                    <DataGridTextColumn Header="Modified" IsReadOnly="True" Binding="{Binding Modified}"/>
+                    <DataGridTextColumn Header="Accessed" IsReadOnly="True" Binding="{Binding Accessed}"/>
                 </DataGrid.Columns>
             </DataGrid>
 
             <ContentControl Grid.Column="0"
                           Content="{Binding FileStructure}"
                           BorderBrush="White">
-                <!--<i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectedItemChanged">
-                        <i:InvokeCommandAction Command="{Binding MainTreeView_SelectedItemChanged}" CommandParameter="{Binding ElementName=MainTreeView,Path=SelectedItem}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>-->
             </ContentControl>
         </Grid>
 
-        <TreeView Visibility="Collapsed">
-            <TreeViewItem>
-                <TreeViewItem>
-                    <TreeViewItem />
-                </TreeViewItem>
-            </TreeViewItem>
-        </TreeView>
-        
         <StackPanel Orientation="Horizontal" Grid.Row="3">
 
         </StackPanel>

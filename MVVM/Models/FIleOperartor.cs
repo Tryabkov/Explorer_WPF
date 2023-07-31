@@ -14,14 +14,10 @@ namespace Explorer_WPF.MVVM.Models
 {
     internal class FIleOperartor
     {
-        public static ObservableCollection<Drive> Drives = new ObservableCollection<Drive>();
-        public static ObservableCollection<Folder> Folders = new ObservableCollection<Folder>();
-        public static ObservableCollection<File> Files = new ObservableCollection<File>();
-
         public static string[] GetDrives()
         {
             var drives = DriveInfo.GetDrives();
-            string[] result= new string[drives.Length];
+            string[] result = new string[drives.Length];
 
             for (int i = 0; i < drives.Length; i++)
             {
@@ -44,44 +40,18 @@ namespace Explorer_WPF.MVVM.Models
             }
             return Folders;
         }
-
-        private static void UpdateFolders(string path)
+        public static string[] GetFiles(string path)
         {
-            Folders.Clear();
-            if (!string.IsNullOrEmpty(path))
+            string[] Folders;
+            try
             {
-                foreach (var item in Directory.GetDirectories(path))
-                {
-                    Folders.Add(new Folder(item));
-                }
+                Folders = Directory.GetFiles(path);
             }
-        }
-
-        private static void UpdateFiles(string path)
-        {
-            Files.Clear();
-            if (!string.IsNullOrEmpty(path))
+            catch (Exception)
             {
-                foreach (var item in Directory.GetFiles(path))
-                {
-                    try
-                    {
-                        Files.Add(new File(item));
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
+                return new string[0];
             }
-        }
-
-        private static void ArrayToList(Array array, IList list)
-        {
-            list.Clear();
-            foreach (var item in array)
-            {
-                list.Add(item);
-            }
+            return Folders;
         }
     }
 }

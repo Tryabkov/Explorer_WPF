@@ -16,9 +16,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="resourses\LeftArrow.png" />
-    <None Remove="resourses\RightArrow.png" />
-    <None Remove="resourses\UpArrow.png" />
+    <None Remove="resources\ArrowLeft_IMG.png" />
+    <None Remove="resources\ArrowRight_IMG.png" />
+    <None Remove="resources\ArrowUp_IMG.png" />
+    <None Remove="resources\File_IMG.png" />
+    <None Remove="resources\Folder_IMG.png" />
+    <None Remove="resources\LeftArrow.png" />
+    <None Remove="resources\NewFile_IMG.png" />
+    <None Remove="resources\RightArrow.png" />
+    <None Remove="resources\UpArrow.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,11 +33,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="resourses\LeftArrow.png">
+    <Resource Include="resources\ArrowLeft_IMG.png" />
+    <Resource Include="resources\ArrowRight_IMG.png" />
+    <Resource Include="resources\ArrowUp_IMG.png" />
+    <Resource Include="resources\File_IMG.png" />
+    <Resource Include="resources\Folder_IMG.png" />
+    <Resource Include="resources\LeftArrow.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="resourses\RightArrow.png" />
-    <Resource Include="resourses\UpArrow.png" />
+    <Resource Include="resources\NewFile_IMG.png" />
+    <Resource Include="resources\RightArrow.png" />
+    <Resource Include="resources\UpArrow.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
