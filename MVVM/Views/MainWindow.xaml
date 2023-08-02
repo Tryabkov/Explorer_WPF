@@ -12,9 +12,12 @@
     <Window.DataContext>
         <viewmodels:MainWindowViewModel/>
     </Window.DataContext>
-
     <!--#region Resourses-->
     <Window.Resources>
+        <Image x:Key="LeftArrowIMG" Source="/resources/ArrowLeft_IMG.png"/>
+        <Image x:Key="RightArrowIMG" Source="/resources/ArrowRight_IMG.png"/>
+        <Image x:Key="UpArrowIMG" Source="/resources/ArrowUp_IMG.png"/>
+        
         <Style x:Key="MoveButtonStyle" TargetType="Button">
             <Setter Property="Width" Value="25"/>
             <Setter Property="Height"  Value="25"/>
@@ -23,9 +26,11 @@
             <Setter Property="BorderBrush"  Value="White"/>
         </Style>
 
-        <Image x:Key="LeftArrow" Source="/resources/ArrowLeft_IMG.png"/>
-        <Image x:Key="RightArrow" Source="/resources/ArrowRight_IMG.png"/>
-        <Image x:Key="UpArrow" Source="/resources/ArrowUp_IMG.png"/>
+        <Style x:Key="PathButtonStyle" TargetType="Button">
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="FontSize" Value="18"/>
+        </Style>
     </Window.Resources>
     <!--#endregion-->
 
@@ -51,29 +56,37 @@
             <!--#region Arrows-->
             <StackPanel Orientation="Horizontal">
                 <Button x:Name="BackButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}" 
-                        Command="{Binding BackButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource LeftArrow}}"/>
+                        Command="{Binding BackButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource LeftArrowIMG}}"/>
 
                 <Button x:Name="ForwardButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}"
-                        Command="{Binding ForwardButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource RightArrow}}"/>
+                        Command="{Binding ForwardButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource RightArrowIMG}}"/>
 
                 <Button x:Name="UpButton" Style="{Binding Mode=OneWay, Source={StaticResource MoveButtonStyle}}"
-                        Command="{Binding UpButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource UpArrow}}"/>
+                        Command="{Binding UpButton_Click}" Content="{Binding Mode=OneWay, Source={StaticResource UpArrowIMG}}"/>
             </StackPanel>
             <!--#endregion-->
 
-            <TextBlock x:Name="PathTextBlock" Margin="24,2,2,2" Grid.Column="1" FontSize="22" TextAlignment="Left" Text="{Binding UI_CurrentPath}"/>
-            <TextBox x:Name="SearchTextBox" Margin="2, 3" Grid.Column="2" Text="{Binding SearchTextBox, Mode=TwoWay}"/>
+            <ItemsControl Margin="24,2,2,2" Grid.Column="1" ItemsSource="{Binding CurrentPath}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+            <TextBox Margin="2, 3" Grid.Column="2" Text="{Binding SearchTextBox, Mode=TwoWay}"/>
         </Grid>
 
+       
+        
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" MinWidth="70"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="6*" MinWidth="350"/>
             </Grid.ColumnDefinitions>
-
+            
             <GridSplitter Grid.Column="1" Width="2" Background="DimGray" ShowsPreview="False" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
-
+            
             <DataGrid x:Name="dataGrid" Grid.Column="2" GridLinesVisibility="Horizontal"
                       SelectionMode="Single"
                       HorizontalGridLinesBrush="#FFF7F7F7"
@@ -116,7 +129,6 @@
         </Grid>
 
         <StackPanel Orientation="Horizontal" Grid.Row="3">
-
         </StackPanel>
     </Grid>
 </Window>

@@ -30,7 +30,7 @@ namespace Explorer_WPF.MVVM.Models
         {
             int slashIndex = path.LastIndexOf('\\');
             int dotIndex = path.LastIndexOf('.');
-            Name = path.Substring(slashIndex + 1);
+            Name = path[(slashIndex + 1)..];
             Type = path[dotIndex..].ToUpper() + " File";
             IsFile = true;
             ImageSourse = "/resources/File_IMG.png";

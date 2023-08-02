@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Xml.XPath;
 using Explorer_WPF.MVVM.Core;
 using Explorer_WPF.MVVM.Models;
 using Microsoft.Xaml.Behaviors;
@@ -19,14 +20,15 @@ namespace Explorer_WPF.MVVM.ViewModels
         public ObservableCollection<BaseItem> FolderContent { get => _folderContent; set { _folderContent = value; OnPropertyChanged(); } }
         private ObservableCollection<BaseItem> _folderContent = new ObservableCollection<BaseItem>();
 
-        public List<string> CurrentPath { get; set; }
-        public ObservableCollection<ObservableCollection<string>> PathHistory { get; set; }
+        public ObservableCollection<CustomButton> CurrentPath { get => _currentPath; set { _currentPath = value; OnPropertyChanged(); } }
+        private ObservableCollection<CustomButton> _currentPath = new ObservableCollection<CustomButton>();
+        public ObservableCollection<ObservableCollection<Button>> PathHistory { get; set; }
         private int PathPlace { get; set; } = 0;
 
         public MainWindowViewModel()
         {
-            CurrentPath = new List<string>();
-            PathHistory = new ObservableCollection<ObservableCollection<string>>();
+
+            PathHistory = new ObservableCollection<ObservableCollection<Button>>();
             _fileStructure.Name = "MainTreeView";
             SetTreeViewTriggers(_fileStructure);
             AddDrivesToFileStructure();
@@ -84,9 +86,28 @@ namespace Explorer_WPF.MVVM.ViewModels
             FolderContent.Clear();
             foreach (var item in folders) FolderContent.Add(new Folder(item));
             foreach (var item in files) FolderContent.Add(new File(item));
+            GeneratePathConsistingFromButtons(path);
         }
 
-        private string ListToString(List<string> list) => string.Join(null, list);
+        //private string CollectionToString(Collection<CustomButton> list)
+        //{
+        //    string[] values= new string[list.Count];
+        //    for (int i = 0; i < values.Length; i++) { values[i] = list[i].Path}
+        //    string.Join(null, list.);
+        //    return ;
+        //}
+
+        private void GeneratePathConsistingFromButtons(string path)
+        {
+            int backSlashIndex = 2;
+            CurrentPath = new ObservableCollection<CustomButton>();
+            while(backSlashIndex != -1)
+            {
+                CurrentPath.Add(new CustomButton(path[..backSlashIndex]));
+                backSlashIndex = path.IndexOf('\\', ++backSlashIndex);
+            }
+            CurrentPath.Add(new CustomButton(path[++backSlashIndex..]));
+        }
 
         private void ItemCreated(TreeViewBaseItem item)
         {
@@ -97,17 +118,10 @@ namespace Explorer_WPF.MVVM.ViewModels
 
         public void TreeViewItem_Selected(object sender, RoutedEventArgs e)
         {
-            var path = ((TreeViewBaseItem)sender).Path;
+            string path = ((TreeViewBaseItem)sender).Path;
             if (path == ((TreeViewBaseItem)e.Source).Path)
             {
                 AddContentToFolderContent(path);
-                CurrentPath.Clear();
-                string[] itm = path.Split('\\');
-                    
-                foreach (var pathItem in itm)
-                {
-                    CurrentPath.Add(pathItem + '\\');
-                }
             }
         }
 
@@ -142,9 +156,7 @@ namespace Explorer_WPF.MVVM.ViewModels
                    if (!selectedItem.IsFile)
                    {
                         AddContentToFolderContent(selectedItem.Path);
-                        CurrentPath.Add(selectedItem.Path.Substring(selectedItem.Path.LastIndexOf('\\')));
                    }
-                   else Console.WriteLine();
                 });
             }
         }
@@ -156,7 +168,7 @@ namespace Explorer_WPF.MVVM.ViewModels
                 return new DelegateCommand((obj) =>
                 {
                     CurrentPath.RemoveAt(CurrentPath.Count - 1);
-                    AddContentToFolderContent(ListToString(CurrentPath));
+                    AddContentToFolderContent(CurrentPath[CurrentPath.Count - 1].Path);
                 }, obj => CurrentPath.Count > 1);
             }
         }
